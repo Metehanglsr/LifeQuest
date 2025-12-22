@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F099F75C-FA92-4EAD-A34C-8ED818552D3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeQuestAPI.Domain", "Core\LifeQuestAPI.Domain\LifeQuestAPI.Domain.csproj", "{A0DC13CB-D5CF-48D0-88C5-249A133677EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeQuestAPI.Application", "Core\LifeQuestAPI.Application\LifeQuestAPI.Application.csproj", "{799C44DE-7B47-4D4E-B810-B5B8451F51E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{41D7EDAA-2363-4FEA-A783-8B96C5C9F956}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{5F08BD1A-7182-4F62-B5B7-B5D5B47B7BC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeQuestAPI.Infrastructure", "Infrastructure\LifeQuestAPI.Infrastructure\LifeQuestAPI.Infrastructure.csproj", "{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeQuestAPI.Persistence", "Infrastructure\LifeQuestAPI.Persistence\LifeQuestAPI.Persistence.csproj", "{F46415D9-E863-4367-B774-3EEE840E2D38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeQuestAPI.API", "Presentation\LifeQuestAPI.API\LifeQuestAPI.API.csproj", "{912293B9-BFC3-420D-9402-1E078C4EF708}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A0DC13CB-D5CF-48D0-88C5-249A133677EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0DC13CB-D5CF-48D0-88C5-249A133677EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0DC13CB-D5CF-48D0-88C5-249A133677EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0DC13CB-D5CF-48D0-88C5-249A133677EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{799C44DE-7B47-4D4E-B810-B5B8451F51E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{799C44DE-7B47-4D4E-B810-B5B8451F51E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{799C44DE-7B47-4D4E-B810-B5B8451F51E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{799C44DE-7B47-4D4E-B810-B5B8451F51E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F46415D9-E863-4367-B774-3EEE840E2D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F46415D9-E863-4367-B774-3EEE840E2D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F46415D9-E863-4367-B774-3EEE840E2D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F46415D9-E863-4367-B774-3EEE840E2D38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{912293B9-BFC3-420D-9402-1E078C4EF708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{912293B9-BFC3-420D-9402-1E078C4EF708}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{912293B9-BFC3-420D-9402-1E078C4EF708}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{912293B9-BFC3-420D-9402-1E078C4EF708}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A0DC13CB-D5CF-48D0-88C5-249A133677EF} = {F099F75C-FA92-4EAD-A34C-8ED818552D3D}
+		{799C44DE-7B47-4D4E-B810-B5B8451F51E4} = {F099F75C-FA92-4EAD-A34C-8ED818552D3D}
+		{CCFD633E-0EB9-4F3D-A5AE-05375B9053F2} = {41D7EDAA-2363-4FEA-A783-8B96C5C9F956}
+		{F46415D9-E863-4367-B774-3EEE840E2D38} = {41D7EDAA-2363-4FEA-A783-8B96C5C9F956}
+		{912293B9-BFC3-420D-9402-1E078C4EF708} = {5F08BD1A-7182-4F62-B5B7-B5D5B47B7BC2}
+	EndGlobalSection
+EndGlobal

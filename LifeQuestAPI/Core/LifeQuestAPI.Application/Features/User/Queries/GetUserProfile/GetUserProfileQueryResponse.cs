@@ -9,5 +9,8 @@ public sealed record GetUserProfileQueryResponse
     public string UserName { get; set; } = string.Empty;
     public int TotalXP { get; set; }
     public double GeneralLevel { get; set; }
-    public List<UserBadgeDto> EarnedBadges { get; set; } = default!;
+    public DateTime CreatedAt { get; set; }
+    public int CompletedTaskCount { get; set; }
+    public List<UserBadgeDto> EarnedBadges { get; set; } = new();
+    public List<CategoryProgressDto> CategoryStats { get; set; } = new();
 }

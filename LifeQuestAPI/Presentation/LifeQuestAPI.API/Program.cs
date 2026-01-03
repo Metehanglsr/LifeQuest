@@ -1,4 +1,5 @@
 using System.Text;
+using LifeQuestAPI.API.BackgroundServices;
 using LifeQuestAPI.Application;
 using LifeQuestAPI.Infrastructure;
 using LifeQuestAPI.Persistence;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
+builder.Services.AddHostedService<DailyQuestWorker>();
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {

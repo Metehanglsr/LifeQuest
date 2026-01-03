@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LifeQuestAPI.Application.Abstractions.DailyQuest;
 using LifeQuestAPI.Application.Abstractions.Gamification;
 using LifeQuestAPI.Application.Abstractions.Token;
+using LifeQuestAPI.Infrastructure.Services.DailyQuest;
 using LifeQuestAPI.Infrastructure.Services.Gamification;
 using LifeQuestAPI.Infrastructure.Services.Token;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,5 +19,6 @@ public static class ServiceRegistration
     {
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IGamificationService, GamificationService>();
+        services.AddScoped<IDailyQuestService, DailyQuestService>();
     }
 }

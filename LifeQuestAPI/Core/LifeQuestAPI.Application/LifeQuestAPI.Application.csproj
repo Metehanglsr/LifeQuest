@@ -17,10 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Auth\Request\" />
     <Folder Include="Features\Badges\Queries\" />
-    <Folder Include="Features\Categories\Queries\" />
     <Folder Include="Features\Roles\Queries\" />
+    <Folder Include="Features\UserBadges\Commands\" />
     <Folder Include="Features\User\Commands\" />
   </ItemGroup>
 

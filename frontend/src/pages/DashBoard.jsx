@@ -1,190 +1,141 @@
-import { useEffect, useState } from 'react';
-import taskService from '../services/taskService';
+import React, { useState, useEffect } from 'react';
+import MainLayout from '../layouts/MainLayout';
+import CategoryCard from '../components/CategoryCard';
+import categoryService from '../services/categoryService';
 import userService from '../services/userService';
-import { useAuth } from '../context/authContext';
-import { getUserIdFromToken } from '../utils/authUtils';
-import { toast } from 'react-toastify';
 
-const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [userStats, setUserStats] = useState({ level: 1, xp: 0, name: 'Savaşçı' });
-  
-  const { logout } = useAuth();
-  const userId = getUserIdFromToken();
+const DashBoard = () => {
+  const [categories, setCategories] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [stats, setStats] = useState({
+    streak: [],
+    streakCount: 0,
+    totalCompleted: 0,
+    weeklyGrowth: 0
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userId) fetchData();
-  }, [userId]);
-
-  const fetchData = async () => {
-    try {
-      const taskRes = await taskService.getAll(userId);
-      setTasks(taskRes.data);
-
+    const fetchDashboardData = async () => {
       try {
-        const lbRes = await userService.getLeaderboard();
-        setLeaderboard(lbRes.data);
-      } catch (e) { console.log("Liderlik tablosu hatası"); }
+        try {
+          const catsRes = await categoryService.getAllCategories();
+          setCategories(Array.isArray(catsRes) ? catsRes : (catsRes?.categories || []));
+        } catch (err) {
+          console.error("Kategoriler hatası:", err);
+        }
 
-      setUserStats({ level: 5, xp: 750, name: "Metehan" }); 
-    } catch (err) {
-      toast.error("Veriler yüklenemedi.");
-    }
-  };
+        try {
+          const actsRes = await userService.getActivities();
+          const activitiesList = actsRes.activities || actsRes.Activities || actsRes || [];
+          
+          setRecentActivities(Array.isArray(activitiesList) ? activitiesList : []);
+        } catch (err) {
+          console.error("Aktiviteler hatası:", err);
+          setRecentActivities([]);
+        }
 
-  const handleComplete = async (taskId) => {
-    try {
-      const response = await taskService.complete(taskId);
-      if(response.data.isSuccess) {
-          toast.success(`Harika! +${response.data.earnedXP || 0} XP Kazandın! 🎉`);
-          fetchData(); 
+        try {
+          const statsRes = await userService.getUserStats();
+          setStats(statsRes || { streak: [], streakCount: 0, totalCompleted: 0, weeklyGrowth: 0 });
+        } catch (err) {
+          console.error("İstatistik hatası:", err);
+        }
+
+      } catch (error) {
+        console.error("Genel Dashboard hatası:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      toast.error("İşlem başarısız.");
-    }
-  };
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
-      
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🚀</span>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                LifeQuest
-              </h1>
-            </div>
-            <button 
-              onClick={logout} 
-              className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            >
-              Çıkış Yap
-            </button>
-          </div>
-        </div>
-      </nav>
+    <MainLayout>
+      <div className="space-y-12">
+        <section className="relative">
+          <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-600/10 blur-[80px] rounded-full"></div>
+          <h2 className="text-4xl font-black text-white italic tracking-tighter mb-2 relative z-10">DASHBOARD</h2>
+          <div className="h-1.5 w-24 bg-indigo-600 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.6)]"></div>
+        </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-              <div className="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 border-4 border-white shadow-lg">
-                🦸‍♂️
-              </div>
-              <h2 className="text-xl font-bold text-gray-800">{userStats.name}</h2>
-              <p className="text-indigo-500 font-medium text-sm">Level {userStats.level} Kahramanı</p>
-
-              <div className="mt-6 text-left">
-                <div className="flex justify-between text-xs font-semibold text-gray-500 mb-1">
-                  <span>XP</span>
-                  <span>{userStats.xp} / 1000</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full" style={{ width: '75%' }}></div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Rozetlerim</h3>
-                <div className="flex justify-center gap-2">
-                  <span className="p-2 bg-yellow-50 rounded-lg text-xl" title="Yeni Başlayan">🌱</span>
-                  <span className="p-2 bg-blue-50 rounded-lg text-xl" title="Kitap Kurdu">📚</span>
-                  <span className="p-2 bg-red-50 rounded-lg text-xl" title="Sporcu">💪</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <span>📜</span> Günlük Görevler
-            </h2>
-            
-            {tasks.length === 0 ? (
-              <div className="bg-white p-8 rounded-xl shadow-sm text-center text-gray-500">
-                🎉 Harikasın! Tüm görevleri tamamladın.
-              </div>
+        <section>
+          <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-6 ml-1">Görev Kategorileri</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {!loading && categories.length > 0 ? (
+              categories.map((cat) => (
+                <CategoryCard key={cat.id} {...cat} />
+              ))
             ) : (
-              <div className="space-y-4">
-                {tasks.map((task) => (
-                  <div key={task.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">
-                          {task.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">{task.description}</p>
-                        
-                        <div className="flex gap-3 mt-3 text-xs font-semibold">
-                          <span className={`px-2 py-1 rounded-md 
-                            ${task.difficulty == 0 ? 'bg-green-100 text-green-700' : 
-                              task.difficulty == 1 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                            {task.difficulty == 0 ? 'Kolay' : task.difficulty == 1 ? 'Orta' : 'Zor'}
-                          </span>
-                          <span className="px-2 py-1 rounded-md bg-indigo-50 text-indigo-600">
-                            ⚡ {task.baseXP} XP
-                          </span>
-                        </div>
+              !loading && <p className="text-slate-500 text-sm italic col-span-4 text-center py-4">Kategori bulunamadı.</p>
+            )}
+            {loading && <p className="text-slate-500 animate-pulse">Yükleniyor...</p>}
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div className="bg-slate-900/40 p-8 rounded-[2rem] border border-slate-800 hover:border-indigo-500/30 transition-all duration-500 group relative">
+               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mb-1">Haftalık Seri</p>
+               <p className="text-5xl font-black text-white group-hover:scale-105 transition-transform origin-left">
+                 {stats.streakCount} GÜN
+               </p>
+               <div className="mt-4 flex gap-1 h-2">
+                 {stats.streak && stats.streak.length > 0 ? stats.streak.map((isActive, i) => (
+                   <div key={i} className={`h-full w-full rounded-full transition-all ${isActive ? 'bg-indigo-500 shadow-[0_0_8px_rgba(79,70,229,0.5)]' : 'bg-slate-800'}`}></div>
+                 )) : (
+                   <span className="text-[10px] text-slate-600">Veri yok</span>
+                 )}
+               </div>
+            </div>
+            
+            <div className="bg-slate-900/40 p-8 rounded-[2rem] border border-slate-800 hover:border-emerald-500/30 transition-all duration-500 group">
+               <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mb-1">Biten Görevler</p>
+               <p className="text-5xl font-black text-white group-hover:scale-105 transition-transform origin-left">
+                 {stats.totalCompleted}
+               </p>
+               <p className="text-emerald-500 text-[10px] mt-4 font-black uppercase tracking-tighter">
+                 Bu hafta %{stats.weeklyGrowth} artış
+               </p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900/60 p-8 rounded-[2rem] border border-slate-800 backdrop-blur-sm">
+            <h3 className="text-white font-black text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
+              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+              Son Aktiviteler
+            </h3>
+            <div className="space-y-6">
+              {!loading && recentActivities.length > 0 ? (
+                recentActivities.map((act) => (
+                  <div key={act.id} className="flex gap-4 relative group">
+                    <div className="w-[2px] bg-slate-800 absolute left-[11px] top-8 bottom-[-24px] group-last:hidden"></div>
+                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-[10px] z-10 ${
+                      act.type === 'TASK' ? 'bg-indigo-600' : act.type === 'BADGE' ? 'bg-amber-500' : 'bg-emerald-500'
+                    }`}>
+                      {act.type === 'TASK' ? '✓' : act.type === 'BADGE' ? '🏆' : '⭐'}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-200">{act.text}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-slate-500 font-medium">{act.time}</span>
+                        {act.xp && <span className="text-[10px] text-indigo-400 font-black">{act.xp}</span>}
                       </div>
-                      
-                      <button 
-                        onClick={() => handleComplete(task.id)}
-                        className="bg-gray-900 hover:bg-indigo-600 text-white p-3 rounded-lg transition-all transform active:scale-95 shadow-lg"
-                        title="Görevi Tamamla"
-                      >
-                        ✅
-                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-4 text-white">
-                <h2 className="font-bold flex items-center gap-2">
-                  <span>🏆</span> Lider Tablosu
-                </h2>
-              </div>
-              <ul className="divide-y divide-gray-100">
-                {leaderboard.length > 0 ? leaderboard.map((user, index) => (
-                  <li key={index} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold 
-                        ${index === 0 ? 'bg-yellow-100 text-yellow-600' : 
-                          index === 1 ? 'bg-gray-100 text-gray-600' : 
-                          index === 2 ? 'bg-orange-100 text-orange-600' : 'text-gray-400'}`}>
-                        {index + 1}
-                      </span>
-                      <span className="font-medium text-gray-700 text-sm">{user.userName}</span>
-                    </div>
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
-                      {user.totalXP} XP
-                    </span>
-                  </li>
-                )) : (
-                  <li className="p-4 text-center text-gray-400 text-sm">Veri yükleniyor...</li>
-                )}
-              </ul>
-            </div>
-            
-            <div className="mt-6 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 text-white text-center shadow-lg">
-              <div className="text-3xl mb-2">🔥</div>
-              <h3 className="font-bold">Zinciri Kırma!</h3>
-              <p className="text-indigo-100 text-sm mt-1">Bugün 3 görev daha yaparsan "İstikrar" rozetini kazanacaksın.</p>
+                ))
+              ) : (
+                 !loading && <p className="text-slate-500 text-xs italic">Henüz aktivite kaydı yok.</p>
+              )}
             </div>
           </div>
-
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
-export default Dashboard;
+export default DashBoard;

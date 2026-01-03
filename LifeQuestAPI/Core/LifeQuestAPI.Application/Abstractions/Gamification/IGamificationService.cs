@@ -9,5 +9,5 @@ namespace LifeQuestAPI.Application.Abstractions.Gamification;
 
 public interface IGamificationService
 {
-    Task<AppUser> AddExperienceAsync(Guid userId, int xpAmount);
+    Task<AppUser> AddExperienceAsync(Guid userId, int xpAmount, Guid? categoryId = null);
 }

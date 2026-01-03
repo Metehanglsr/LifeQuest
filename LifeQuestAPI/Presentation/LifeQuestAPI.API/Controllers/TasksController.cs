@@ -1,5 +1,4 @@
-﻿using LifeQuestAPI.Application.Features.Tasks.Commands.CompleteTask;
-using LifeQuestAPI.Application.Features.Tasks.Commands.CreateBulkTasks;
+﻿using LifeQuestAPI.Application.Features.Tasks.Commands.CreateBulkTasks;
 using LifeQuestAPI.Application.Features.Tasks.Commands.CreateTask;
 using LifeQuestAPI.Application.Features.Tasks.Queries.GetAll;
 using MediatR;
@@ -26,16 +25,7 @@ public class TasksController : ControllerBase
         var response = await _mediator.Send(new GetAllTasksQueryRequest());
         return Ok(response);
     }
-    [HttpPost("complete")]
-    public async Task<IActionResult> CompleteTask(CompleteTaskCommandRequest request)
-    {
-        var response = await _mediator.Send(request);
 
-        if (!response.Success)
-            return BadRequest(response);
-
-        return Ok(response);
-    }
     [HttpPost("create-task")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateTask(CreateTaskCommandRequest request)

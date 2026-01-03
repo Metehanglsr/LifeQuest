@@ -1,5 +1,6 @@
 ﻿using LifeQuestAPI.Application.Features.Categories.Commands.CreateBulkCategories;
 using LifeQuestAPI.Application.Features.Categories.Commands.CreateCategory;
+using LifeQuestAPI.Application.Features.Categories.Queries.GetAllCategories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,12 @@ public class CategoriesController : ControllerBase
     public CategoriesController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var response = await _mediator.Send(new GetAllCategoriesQueryRequest());
+        return Ok(response);
     }
 
     [HttpPost("create-category")]

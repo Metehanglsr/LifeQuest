@@ -15,41 +15,81 @@ public sealed class GamificationService : IGamificationService
 {
     private readonly IAppUserReadRepository _userReadRepository;
     private readonly IAppUserWriteRepository _userWriteRepository;
-
     private readonly IBadgeReadRepository _badgeReadRepository;
     private readonly IUserBadgeReadRepository _userBadgeReadRepository;
     private readonly IUserBadgeWriteRepository _userBadgeWriteRepository;
+    private readonly IUserCategoryProgressReadRepository _categoryProgressReadRepository;
+    private readonly IUserCategoryProgressWriteRepository _categoryProgressWriteRepository;
 
     public GamificationService(
         IAppUserReadRepository userReadRepository,
         IAppUserWriteRepository userWriteRepository,
         IBadgeReadRepository badgeReadRepository,
         IUserBadgeReadRepository userBadgeReadRepository,
-        IUserBadgeWriteRepository userBadgeWriteRepository)
+        IUserBadgeWriteRepository userBadgeWriteRepository,
+        IUserCategoryProgressReadRepository categoryProgressReadRepository,
+        IUserCategoryProgressWriteRepository categoryProgressWriteRepository)
     {
         _userReadRepository = userReadRepository;
         _userWriteRepository = userWriteRepository;
         _badgeReadRepository = badgeReadRepository;
         _userBadgeReadRepository = userBadgeReadRepository;
         _userBadgeWriteRepository = userBadgeWriteRepository;
+        _categoryProgressReadRepository = categoryProgressReadRepository;
+        _categoryProgressWriteRepository = categoryProgressWriteRepository;
     }
 
-    public async Task<AppUser> AddExperienceAsync(Guid userId, int xpAmount)
+    public async Task<AppUser> AddExperienceAsync(Guid userId, int xpAmount, Guid? categoryId = null)
     {
         var user = await _userReadRepository.GetByIdAsync(userId.ToString(), tracking: true);
 
         if (user == null) throw new Exception("Kullanıcı bulunamadı!");
 
         user.TotalXP += xpAmount;
-        double newLevel = 1 + (user.TotalXP / 100.0);
-        user.GeneralLevel = newLevel;
+        user.GeneralLevel = 1 + (user.TotalXP / 1000.0);
 
         _userWriteRepository.Update(user);
+
+        if (categoryId.HasValue)
+        {
+            await HandleCategoryProgression(userId, categoryId.Value, xpAmount);
+        }
+
         await _userWriteRepository.SaveAsync();
 
         await CheckAndAwardBadges(user.Id, (int)user.GeneralLevel);
 
         return user;
+    }
+
+    private async Task HandleCategoryProgression(Guid userId, Guid categoryId, int xpAmount)
+    {
+        var progress = await _categoryProgressReadRepository.Table
+            .FirstOrDefaultAsync(cp => cp.AppUserId == userId && cp.CategoryId == categoryId);
+
+        if (progress == null)
+        {
+            progress = new UserCategoryProgress
+            {
+                AppUserId = userId,
+                CategoryId = categoryId,
+                Level = 1,
+                CurrentXp = 0,
+                XpToNextLevel = 100
+            };
+            await _categoryProgressWriteRepository.AddAsync(progress);
+        }
+
+        progress.CurrentXp += xpAmount;
+
+        while (progress.CurrentXp >= progress.XpToNextLevel)
+        {
+            progress.CurrentXp -= progress.XpToNextLevel;
+            progress.Level++;
+            progress.XpToNextLevel += 50;
+        }
+
+        await _categoryProgressWriteRepository.SaveAsync();
     }
 
     private async Task CheckAndAwardBadges(Guid userId, int currentLevel)
@@ -60,13 +100,12 @@ public sealed class GamificationService : IGamificationService
 
         var ownedBadges = await _userBadgeReadRepository
             .GetWhere(ub => ub.AppUserId == userId, tracking: false)
+            .Select(ub => ub.BadgeId)
             .ToListAsync();
-
-        var ownedBadgeIds = ownedBadges.Select(ub => ub.BadgeId).ToList();
 
         foreach (var badge in eligibleBadges)
         {
-            if (!ownedBadgeIds.Contains(badge.Id))
+            if (!ownedBadges.Contains(badge.Id))
             {
                 var newUserBadge = new UserBadge
                 {

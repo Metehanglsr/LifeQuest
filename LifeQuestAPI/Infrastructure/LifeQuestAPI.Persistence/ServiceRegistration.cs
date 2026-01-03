@@ -38,5 +38,8 @@ public static class ServiceRegistration
 
         services.AddScoped<ICategoryReadRepository, CategoryReadRepository>();
         services.AddScoped<ICategoryWriteRepository, CategoryWriteRepository>();
+
+        services.AddScoped<IUserCategoryProgressReadRepository, UserCategoryProgressReadRepository>();
+        services.AddScoped<IUserCategoryProgressWriteRepository, UserCategoryProgressWriteRepository>();
     }
 }
